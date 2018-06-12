@@ -1,0 +1,237 @@
+<html>
+	<head>
+		<title>Your Charts</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css">
+		<script src="test.json"></script>
+		<style>
+			body {
+				background-color: rgb(250,250,250);
+			}
+			#rcv-chrt, #snd-chrt {
+				max-width: 70%;
+				margin-left: 15%;
+			}
+			.footer {
+				background-color: rgb(240,240,240);
+			}
+
+			nav.level {
+				height: 4rem;
+				background-color: rgb(240,240,240);
+			}
+			nav.level p:hover {
+				cursor: pointer;
+			}
+			.footer {
+				padding-bottom: 3rem;
+			}
+		</style>
+	</head>
+	<body>
+		<section class="hero is-dark" style="margin-bottom: 2rem;">
+			<div class="hero-body">
+				<div class="container">
+					<h1 class="title">Facebook Messenger Stats</h1>
+					<h2 class="subtitle">Showing stats for Lewis Dick</h2>
+				</div>
+			</div>
+		</section>
+		<!--<nav class="level"><p class="level-item has-text-centered"><strong>Graphs</strong></p><p class="level-item has-text-centered"><strong>Tables</strong></p></nav>-->
+		
+		<div class="container is-widerscreen">
+		<div class="level">
+			<div class="level-item has-text-centered">
+				<div>
+					<p class="heading">Conversations</p>
+					<p class="title" id="conversations">N/A</p>
+				</div>
+			</div>
+			<div class="level-item has-text-centered">
+				<div>
+					<p class="heading">Received</p>
+					<p class="title" id="msgRcv">N/A</p>
+				</div>
+			</div>
+			<div class="level-item has-text-centered">
+				<div>
+					<p class="heading">Sent</p>
+					<p class="title" id="msgSnd">N/A</p>
+				</div>
+			</div>
+		</div>
+		</div>
+
+
+		<div class="container is-widerscreen" style="padding-bottom: 5rem">
+			<h1 class="title" style="margin-left: 15%;margin-top: 5rem;">Messages Received</h1>
+			<canvas id="rcv-chrt" width="400" height="155" ></canvas>
+			<h1 class="title" style="margin-left: 15%; margin-top: 5rem; ">Messages Sent</h1>
+			<canvas id="snd-chrt" width="400" height="155" ></canvas>
+		</div>
+		<footer class="footer">
+			<div class="container">
+				<div class="content has-text-centered">
+					<p>Built by <strong>Lewis Dick</strong> using ChartJS & Bulma.</p>
+					<a href="https://github.com/LewisDick/FacebookMessageStats"><img src="https://lewisdick.com/img/github.png" alt="github logo" style="opacity: 0.7;"></a>
+				</div>
+			</div>
+		</footer>
+	</body>
+	<script>
+		let rcvChrt = document.getElementById('rcv-chrt').getContext('2d');
+		let dataset = [];
+		let colours = [];
+		let totalSendByYear = new Array(8).fill(0);
+		let totalReceiveByYear = new Array(8).fill(0);
+		if(typeof tempData !== 'undefined'){
+		let jsonData = tempData.people;
+		let totalRcv = 0;
+		let totalSnd = 0;
+		console.log(totalSendByYear);
+		for(let key in jsonData){
+			let randomColor = "rgba(" + Math.random(255)*(255) + "," + Math.random(255)*(255) + "," + Math.random(255)*(255)  + ",0.7)";
+			colours.push(randomColor);
+			let obj = {
+				label: key,
+				data: jsonData[key][0],
+				fill: false,
+				borderColor:randomColor,
+				pointBackgroundColor: randomColor,
+				pointHoverBackgroundColor: randomColor,
+				pointHoverBorderColor: randomColor
+			};
+			dataset.push(obj);
+
+			for(let count in jsonData[key][0]){
+				totalRcv += parseInt(jsonData[key][0][count]);
+				totalSendByYear[count] += parseInt(jsonData[key][1][count]);
+				totalSnd += parseInt(jsonData[key][1][count]);
+				totalReceiveByYear[count] += parseInt(jsonData[key][0][count]);
+			}
+		}
+		dataset.push({
+			label: "Total",
+			data: totalReceiveByYear,
+			fill:false,
+			borderColor: "rgba(0,0,0,0.5)",
+			borderDash: [5,5],
+			pointBackgroundColor: "rgba(0,0,0,0.5)",
+			pointHoverBackgroundColor: "rgba(0,0,0,0.5)",
+			pointHoverBorderColor: "rgba(0,0,0,0.5)"
+		});
+		document.getElementById('msgSnd').innerHTML = totalRcv;
+		document.getElementById('msgRcv').innerHTML = totalSnd;
+		} else {
+		}
+
+		let messageReceiveChart = new Chart(rcvChrt, {
+			type: 'line',
+			data: {
+				labels: ["2011", "2012","2013","2014","2015","2016","2017","2018"],
+				datasets: dataset
+
+			},
+			options: {
+				legend: {
+					display:false,
+					position: "right"
+				},
+				scales: {
+					yAxes :[{
+						scaleLabel: {
+							display:true,
+							labelString: '# of messages'
+						}
+					}],
+					xAxes :[{
+						scaleLabel:{
+							display:true,
+							labelString: 'Year'
+						}
+					}]
+				},
+				tooltips :{
+					displayColors:false
+				}
+			}
+
+		});
+		
+	</script>
+
+	<script>
+		let sndChrt = document.getElementById('snd-chrt').getContext('2d');
+		
+		let sendDataset = [];
+
+		if(typeof tempData !== 'undefined'){
+			let jsonData = tempData.people;
+			let colourIncrement = 0;
+			let totalSendByYear = new Array(8).fill(0);
+			for(let key in jsonData){
+	
+				let obj = {
+					label: key,
+					data: jsonData[key][1],
+					fill: false,
+					borderColor:colours[colourIncrement],
+					pointBackgroundColor: colours[colourIncrement],
+					pointHoverBackgroundColor: colours[colourIncrement],
+					pointHoverBorderColor: colours[colourIncrement]
+				};
+				sendDataset.push(obj);
+				for(let count in jsonData[key][1]){
+					totalSendByYear[count] += parseInt(jsonData[key][1][count]);
+				}
+				colourIncrement += 1;
+			}
+			document.getElementById('conversations').innerHTML = colours.length;
+			
+			sendDataset.push({
+				label: "Total",
+				data: totalSendByYear,
+				fill:false,
+				borderColor: "rgba(0,0,0,0.5)",
+				borderDash: [5,5],
+				pointBackgroundColor: "rgba(0,0,0,0.5)",
+				pointHoverBackgroundColor: "rgba(0,0,0,0.5)",
+				pointHoverBorderColor: "rgba(0,0,0,0.5)"
+			});
+		}
+
+		let messageSendChart = new Chart(sndChrt, {
+			type: 'line',
+			data: {
+				labels: ["2011", "2012","2013","2014","2015","2016","2017","2018"],
+				datasets: sendDataset
+
+			},
+			options: {
+				legend: {
+					display:false,
+					position: "right"
+				},
+				scales: {
+					yAxes :[{
+						scaleLabel: {
+							display:true,
+							labelString: '# of messages'
+						}
+					}],
+					xAxes :[{
+						scaleLabel:{
+							display:true,
+							labelString: 'Year'
+						}
+					}]
+				},
+				tooltips :{
+					displayColors:false
+				}
+			}
+
+		});
+		
+	</script>
+</html>

@@ -1,8 +1,8 @@
-import json, os, datetime
+import json, os, datetime, webbrowser
 
 current_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
-
+#total = dict("people")
 people = dict()
 """
 Gets the name of the current user, to differentiate between them and other people
@@ -13,12 +13,13 @@ with open(current_location + "\\profile_information\\profile_information.json") 
 
 current_user_name = current_user_json.get("name")
 current_user_data.close()
-
+html_location = current_location
 current_location += "\messages"
 test = next(os.walk(current_location))[1]
 
 for folder in test:
     if os.path.exists(current_location + "\\" + folder + "\\message.json"):
+        print("Loading conversation " + folder + " data..")
         with open(current_location + "\\" + folder + "\\message.json", "r") as current_conversation:
             data = current_conversation.read()
 
@@ -56,17 +57,18 @@ for folder in test:
                     else:
                         people[conversation_data.get("participants")[0]][1][year_index] += 1
                 else:
-                    print(msg.get("sender_name").encode("utf-8"))
                     people.update({msg.get("sender_name"): [[0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0]]})
                     people[msg.get("sender_name")][0][year_index] += 1
 
-
+print("\n")
+print("Data successfully loaded....")
+print("Writing to data.csv..")
 file_out = open("test.csv", "wb")
 file_out.write(
     "Person,2011,2012,2013,2014,2015,2016,2017,2018,,Person,2011,2012,2013,2014,2015,2016,2017,2018".encode("latin-1"))
 file_out.write("\n".encode("latin-1"))
 
-
+"""
 for p in people:
     csv_out = p.replace(',', ' ').replace('"', ' ')
 
@@ -78,6 +80,14 @@ for p in people:
 
     file_out.write(csv_out.encode("utf-8"))
     file_out.write("\n".encode("latin-1"))
-
 file_out.close()
+"""
 
+print("Writing complete..")
+with open("test.json", "w") as js:
+    js.write('let tempData = {"people":')
+    json.dump(people, js)
+    js.write('}')
+    js.close()
+
+webbrowser.open(html_location + "\chats.html")
