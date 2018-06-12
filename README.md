@@ -1,6 +1,6 @@
 # FacebookMessageStats
 ### A python script that generates graphs and statistics from facebook data
-![Gif of script running](https://lewisdick.com/github/9eDHd3Mbht.gif)
+![Gif of script running](https://lewisdick.com/github/header.png)
 
 # INSTALLATION / SETUP
 Usage of this script requires that at least python 3.5 is installed on your system. A detailed guide on how to do this can be found [here](http://docs.python-guide.org/en/latest/starting/installation/)
